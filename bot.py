@@ -1,15 +1,24 @@
 from twitchio.ext import commands
+import os
 
 class Bot(commands.Bot):
-
     def __init__(self):
-        super().__init__(token='oauth:ylrsztrpajobjqbaaxlmc5xfj3so0h', prefix='!', initial_channels=['11kaboy', 'bardan9'])
+        # قراءة الـ OAuth Token من متغيرات البيئة
+        token = os.getenv('TWITCH_OAUTH_TOKEN')
+        
+        # قراءة أسماء القنوات من متغيرات البيئة وتحويلها إلى قائمة
+        channels = os.getenv('TWITCH_CHANNELS').split(',')
+        
+        # تهيئة البوت
+        super().__init__(token=token, prefix='!', initial_channels=channels)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
-        print(f'User id is | {self.user_id}')
 
     async def event_message(self, message):
+        # تجاهل الرسائل المرسلة من البوت نفسه
+        if message.author.name.lower() == self.nick.lower():
+            return
         print(message.content)
         await self.handle_commands(message)
 
@@ -17,5 +26,6 @@ class Bot(commands.Bot):
     async def hello(self, ctx):
         await ctx.send(f'Hello {ctx.author.name}!')
 
-bot = Bot()
-bot.run()
+if __name__ == "__main__":
+    bot = Bot()
+    bot.run()
