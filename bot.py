@@ -21,7 +21,7 @@ class Bot(commands.Bot):
             return
         
         # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
-        print(f'[Channel: {message.channel.name}] [User: {message.author.name}] Message: {message.content}')
+        print(f'[ {channel.name}] [ {author.name}] Message: {message.content}')
         
         # معالجة الأوامر
         await self.handle_commands(message)
