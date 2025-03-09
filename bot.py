@@ -10,7 +10,7 @@ class Bot(commands.Bot):
         channels = os.getenv('TWITCH_CHANNELS').split(',')
         
         # تهيئة البوت
-        super().__init__(token=token, prefix='!!!!!', initial_channels=channels)
+        super().__init__(token=token, prefix='!', initial_channels=channels)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
