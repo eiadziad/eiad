@@ -13,15 +13,15 @@ class Bot(commands.Bot):
         if not channels:
             raise ValueError("TWITCH_CHANNELS environment variable is not set.")
         
-        channels_list = [channel.strip() for channel in channels.split(',')]
-        print(f"Attempting to join channels: {channels_list}")
+        self.channels_list = [channel.strip() for channel in channels.split(',')]
+        print(f"Attempting to join channels: {self.channels_list}")
         
         # تهيئة البوت
-        super().__init__(token=token, prefix='!', initial_channels=channels_list)
+        super().__init__(token=token, prefix='!', initial_channels=self.channels_list)
 
     async def event_ready(self):
         print(f'[Bot] Logged in as | {self.nick}')
-        print(f'[Bot] Joined channels: {self.initial_channels}')
+        print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
     async def event_message(self, message):
         # تجاهل الرسائل المرسلة من البوت نفسه
