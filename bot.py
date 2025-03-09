@@ -13,17 +13,22 @@ class Bot(commands.Bot):
         super().__init__(token=token, prefix='!', initial_channels=channels)
 
     async def event_ready(self):
-        print(f'Logged in as | {self.nick}')
+        print(f'[Bot] Logged in as | {self.nick}')
 
     async def event_message(self, message):
         # تجاهل الرسائل المرسلة من البوت نفسه
         if message.author.name.lower() == self.nick.lower():
             return
-        print(message.content)
+        
+        # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
+        print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
+        
+        # معالجة الأوامر
         await self.handle_commands(message)
 
     @commands.command(name='hello')
     async def hello(self, ctx):
+        # إرسال رد إلى المستخدم
         await ctx.send(f'Hello {ctx.author.name}!')
 
 if __name__ == "__main__":
