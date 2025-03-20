@@ -7,12 +7,20 @@ char_map = {
     'h': 'ا', 'g': 'ل', ']': 'د', '[': 'ج', 'p': 'ح', 'o': 'خ', 'i': 'ه', 'u': 'ع', 'y': 'غ',
     't': 'ف', 'r': 'ق', 'e': 'ث', 'w': 'ص', 'q': 'ض', '`': 'ذ', "'": 'ط', ';': 'ك', 'l': 'م',
     'k': 'ن', 'j': 'ت', 'f': 'ب', 'd': 'ي', 's': 'س', 'a': 'ش', '/': 'ظ', '.': 'ز', ',': 'و',
-    'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ', ' ': ' '  # ضمان بقاء المسافات
+    'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ', ' ': ' '  # الحفاظ على المسافات
 }
 
 def replace_chars(text):
-    """تحويل الأحرف في النص بناءً على char_map، مع دعم الأحرف الكبيرة والصغيرة"""
+    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات"""
     return ''.join(char_map.get(ch.lower(), ch) for ch in text)
+
+def clean_text(text):
+    """إصلاح أي تحويل غير صحيح في النص"""
+    # استبدال أي شكل من أشكال \s أو \ بمسافة حقيقية
+    text = re.sub(r'\\s|\\', ' ', text)
+    # إزالة أي مسافات متكررة
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -55,14 +63,11 @@ class Bot(commands.Bot):
                 original_sender = message.tags['reply-parent-display-name']
                 original_message = message.tags['reply-parent-msg-body']
                 
+                # تنظيف الرسالة من أي محارف غريبة قبل المعالجة
+                cleaned_message = clean_text(original_message)
+                
                 # استبدال الأحرف في الرسالة الأصلية
-                replaced_message = replace_chars(original_message)
-                
-                # التأكد من استبدال أي "\s" أو "\" بمسافة حقيقية
-                replaced_message = replaced_message.replace("\\s", " ").replace("\\", " ")
-                
-                # تنظيف المسافات المتكررة
-                replaced_message = re.sub(r'\s+', ' ', replaced_message).strip()
+                replaced_message = replace_chars(cleaned_message)
                 
                 # إرسال الرد إلى القناة
                 await message.channel.send(f"انهو يقول ( {replaced_message} )")
