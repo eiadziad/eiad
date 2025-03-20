@@ -27,15 +27,15 @@ class Bot(commands.Bot):
         print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
     async def event_message(self, message):
-        # تأكيد وجود معلومات المؤلف قبل المتابعة
+        # التأكد من وجود معلومات المؤلف قبل المتابعة
         if not message.author or not getattr(message.author, "name", None):
             return
 
-        # إذا كانت الرسالة تبدأ بـ "ترجم"
-        if message.content.startswith("ترجم"):
+        # البحث عن وجود كلمة "ترجم" في محتوى الرسالة
+        if "ترجم" in message.content:
             print(f"استقبال أمر 'ترجم' من المستخدم: {message.author.name}")
             print("بيانات التاج الخاصة بالرسالة:", message.tags)
-
+            
             # التأكد من أن المستخدم هو EIADu (حتى وإن كان اسم البوت نفسه)
             if message.author.name.lower() == "eiadu":
                 # محاولة استخراج نص الرسالة التي تم الرد عليها من التاج "reply-parent-msg-body"
