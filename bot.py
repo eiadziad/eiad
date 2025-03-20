@@ -57,8 +57,8 @@ class Bot(commands.Bot):
         # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
         print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
         
-        # التحقق من أن الرسالة عبارة عن رد (reply) وتحتوي على كلمة "بدل"
-        if 'reply-parent-msg-id' in message.tags and 'بدل' in message.content.lower():
+        # السماح فقط للمستخدم EIADu بتشغيل أمر "بدل"
+        if message.author.name.lower() == "eiadu" and 'reply-parent-msg-id' in message.tags and 'بدل' in message.content.lower():
             if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
                 original_sender = message.tags['reply-parent-display-name']
                 original_message = message.tags['reply-parent-msg-body']
