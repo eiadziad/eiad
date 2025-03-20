@@ -30,7 +30,7 @@ class Bot(commands.Bot):
         if (
             message.content.strip().lower() == 'ترجم' 
             and message.reference 
-            and message.author.name.lower() == 'eiadu'
+            and message.author.name.lower() == 'EIADu'
         ):
             try:
                 replied_msg = await message.channel.fetch_message(message.reference.id)
