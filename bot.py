@@ -11,7 +11,7 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية مع الحفاظ على المسافات"""
+    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات"""
     return ''.join(char_map.get(ch.lower(), ch) for ch in text)
 
 def clean_text(text):
@@ -45,9 +45,7 @@ class Bot(commands.Bot):
         print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
     async def event_message(self, message):
-        # تجاهل الرسائل المرسلة من البوت نفسه
-        if message.author.name.lower() == self.nick.lower():
-            return
+
         
         # تجاهل الرسائل التي تبدأ بعلامة "!"
         if message.content.startswith('!'):
@@ -57,8 +55,8 @@ class Bot(commands.Bot):
         # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
         print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
         
-        # السماح فقط للمستخدم EIADu بتشغيل أمر "بدل"
-        if message.author.name.lower() == "eiadu" and 'reply-parent-msg-id' in message.tags and 'بدل' in message.content.lower():
+        # السماح فقط للمستخدم EIADu بتشغيل أمر "بدل"، وتجاهل تنفيذ البوت للأمر بنفسه
+        if message.author.name.lower() == "eiadu" and self.nick.lower() != "eiadu" and 'reply-parent-msg-id' in message.tags and 'بدل' in message.content.lower():
             if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
                 original_sender = message.tags['reply-parent-display-name']
                 original_message = message.tags['reply-parent-msg-body']
