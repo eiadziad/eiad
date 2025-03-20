@@ -1,5 +1,6 @@
 from twitchio.ext import commands
 import os
+from googletrans import Translator
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -28,13 +29,26 @@ class Bot(commands.Bot):
         if message.author.name.lower() == self.nick.lower():
             return
         
-        # تجاهل الرسائل التي تبدأ بعلامة "!"
-        if message.content.startswith('!'):
-            print(f"Ignoring command: {message.content}")
-            return
-        
         # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
         print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
+        
+        # التحقق من أن الرسالة هي "ترجم" كرد على رسالة أخرى ومن المستخدم EIADu
+        if message.content.strip() == 'ترجم' and message.referenced_message is not None and message.author.name.lower() == 'eiadu':
+            try:
+                # استخراج النص الأصلي من الرسالة التي تم الرد عليها
+                original_text = message.referenced_message.content
+                # إنشاء كائن للترجمة
+                translator = Translator()
+                # ترجمة النص إلى العربية
+                translated = translator.translate(original_text, dest='ar')
+                # إرسال الترجمة إلى الدردشة
+                await message.channel.send(f"الترجمة: {translated.text}")
+            except Exception as e:
+                print(f"حدث خطأ أثناء الترجمة: {e}")
+                await message.channel.send("فيه مشكلة ما اقدر اترجم لك يا غالي")
+        
+        # معالجة الأوامر (ضروري لتنفيذ الأوامر الأخرى)
+        await self.handle_commands(message)
 
 if __name__ == "__main__":
     bot = Bot()
