@@ -24,18 +24,21 @@ class Bot(commands.Bot):
         if not message.author or not getattr(message.author, "name", None):
             return
 
-        # البحث عن وجود كلمة "ترجم" في محتوى الرسالة
         if "ترجم" in message.content:
             if message.author.name.lower() == "eiadu":
                 parent_text = message.tags.get("reply-parent-msg-body")
                 if parent_text:
                     try:
-                        translated = self.translator.translate(parent_text, dest='ar', src='auto')
-                        await message.channel.send(f"** {translated.text} **")
+                        # إذا كانت الرسالة باللغة الإنجليزية (أي تحتوي على أحرف ASCII فقط)
+                        if parent_text.isascii():
+                            translated = self.translator.translate(parent_text, dest='ar', src='en')
+                        else:
+                            translated = self.translator.translate(parent_text, dest='ar', src='auto')
+                        await message.channel.send(f"الترجمة: {translated.text}")
                     except Exception as e:
-                        await message.channel.send("❌")
+                        await message.channel.send("حدث خطأ أثناء عملية الترجمة.")
                 else:
-                    await message.channel.send("رد طيب")
+                    await message.channel.send("لا يوجد رسالة مُرد عليها للترجمة.")
             return
 
         if message.author.name.lower() == self.nick.lower():
