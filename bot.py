@@ -1,6 +1,6 @@
 from twitchio.ext import commands
 import os
-from googletrans import Translator  # تأكد من تثبيت مكتبة googletrans
+from googletrans import Translator  # تأكد من تثبيت مكتبة googletrans باستخدام pip install googletrans
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -27,28 +27,27 @@ class Bot(commands.Bot):
         print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
     async def event_message(self, message):
-        # تجاهل الرسائل المرسلة من البوت نفسه
-        if message.author.name.lower() == self.nick.lower():
-            return
-        
-        # تجاهل الرسائل التي تبدأ بعلامة "!"
-        if message.content.startswith('!'):
-            print(f"Ignoring command: {message.content}")
-            return
-        
-        # التحقق من أمر "ترجم" في حال كان الرد على رسالة
+        # معالجة أمر "ترجم" قبل تجاهل الرسائل من البوت نفسه
         if message.content.startswith("ترجم"):
-            # التأكد من أن المستخدم هو EIADu
+            # التأكد من أن المستخدم هو EIADu (حتى وإن كان اسم البوت هو EIADu)
             if message.author.name.lower() == "eiadu":
-                # محاولة الحصول على نص الرسالة المُرد عليها
-                # يعتمد هذا على وجود التاج "reply-parent-msg-body" في الرسالة
+                # محاولة الحصول على نص الرسالة المُرد عليها (يعتمد ذلك على وجود التاج "reply-parent-msg-body")
                 parent_text = message.tags.get("reply-parent-msg-body")
                 if parent_text:
                     translated = self.translator.translate(parent_text, dest='ar')
                     await message.channel.send(f"الترجمة: {translated.text}")
                 else:
                     await message.channel.send("لا يوجد رسالة مُرد عليها للترجمة.")
-            # لا نستجيب لأوامر "ترجم" من مستخدمين آخرين
+            # لا نقوم بمعالجة المزيد من الرسائل بعد أمر الترجمة
+            return
+
+        # تجاهل الرسائل المرسلة من البوت نفسه (إذا لم تكن أوامر خاصة)
+        if message.author.name.lower() == self.nick.lower():
+            return
+
+        # تجاهل الرسائل التي تبدأ بعلامة "!"
+        if message.content.startswith('!'):
+            print(f"Ignoring command: {message.content}")
             return
         
         # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
