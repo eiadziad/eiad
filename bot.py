@@ -1,3 +1,4 @@
+import asyncio  # استيراد مكتبة asyncio لإضافة التأخير
 from twitchio.ext import commands
 import os
 import re
@@ -58,7 +59,7 @@ class Bot(commands.Bot):
         print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
         
         # السماح فقط للمستخدم EIADu أو البوت EIADu بتنفيذ أمر "بدل"
-        if message.author.name.lower() == "eiadu" and 'reply-parent-msg-id' in message.tags and 'بدل' in message.content.lower():
+        if message.author.name.lower() == "eiadu" and 'reply-parent-msg-id' in message.tags and 'غير' in message.content.lower():
             if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
                 original_sender = message.tags['reply-parent-display-name']
                 original_message = message.tags['reply-parent-msg-body']
@@ -69,8 +70,11 @@ class Bot(commands.Bot):
                 # استبدال الأحرف في الرسالة الأصلية
                 replaced_message = replace_chars(cleaned_message)
                 
+                # ⏳ **إضافة تأخير لمدة ثانية واحدة قبل إرسال الرد**
+                await asyncio.sleep(1)
+                
                 # إرسال الرد إلى القناة
-                await message.channel.send(f"انهو يقول ( {replaced_message} )")
+                await message.channel.send(f"**( {replaced_message} )**")
 
 if __name__ == "__main__":
     bot = Bot()
