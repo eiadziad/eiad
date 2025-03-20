@@ -27,21 +27,32 @@ class Bot(commands.Bot):
         print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
     async def event_message(self, message):
-        # التأكد من أن message.author ليس None
+        # تأكيد وجود معلومات المؤلف قبل المتابعة
         if not message.author or not getattr(message.author, "name", None):
             return
 
-        # معالجة أمر "ترجم" قبل تجاهل الرسائل من البوت نفسه
+        # إذا كانت الرسالة تبدأ بـ "ترجم"
         if message.content.startswith("ترجم"):
-            # التأكد من أن المستخدم هو EIADu (حتى وإن كان اسم البوت هو EIADu)
+            print(f"استقبال أمر 'ترجم' من المستخدم: {message.author.name}")
+            print("بيانات التاج الخاصة بالرسالة:", message.tags)
+
+            # التأكد من أن المستخدم هو EIADu (حتى وإن كان اسم البوت نفسه)
             if message.author.name.lower() == "eiadu":
-                # محاولة الحصول على نص الرسالة المُرد عليها
+                # محاولة استخراج نص الرسالة التي تم الرد عليها من التاج "reply-parent-msg-body"
                 parent_text = message.tags.get("reply-parent-msg-body")
                 if parent_text:
-                    translated = self.translator.translate(parent_text, dest='ar')
-                    await message.channel.send(f"الترجمة: {translated.text}")
+                    print("تم العثور على نص الرسالة المُرد عليها:", parent_text)
+                    try:
+                        translated = self.translator.translate(parent_text, dest='ar')
+                        await message.channel.send(f"الترجمة: {translated.text}")
+                    except Exception as e:
+                        print("حدث خطأ أثناء الترجمة:", e)
+                        await message.channel.send("حدث خطأ أثناء عملية الترجمة.")
                 else:
+                    print("لم يتم العثور على التاج 'reply-parent-msg-body' في الرسالة.")
                     await message.channel.send("لا يوجد رسالة مُرد عليها للترجمة.")
+            else:
+                print("المستخدم ليس EIADu، لا يتم تنفيذ أمر الترجمة.")
             return
 
         # تجاهل الرسائل المرسلة من البوت نفسه (إذا لم تكن أوامر خاصة)
