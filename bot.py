@@ -1,6 +1,7 @@
 from twitchio.ext import commands
 import os
 from googletrans import Translator
+from collections import deque
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -13,7 +14,7 @@ class Bot(commands.Bot):
             raise ValueError("TWITCH_CHANNELS not set!")
         
         self.channels_list = [ch.strip() for ch in channels.split(',')]
-        self.last_messages = {}  # لتخزين آخر رسالة في كل قناة
+        self.message_history = {} # تخزين آخر 5 رسائل لكل قناة
         super().__init__(token=token, prefix='!', initial_channels=self.channels_list)
 
     async def event_ready(self):
@@ -21,36 +22,39 @@ class Bot(commands.Bot):
         print(f'[Bot] Channels: {self.channels_list}')
 
     async def event_message(self, message):
-        # تحديث آخر رسالة في القناة
-        self.last_messages[message.channel.name] = message
+        # تحديث تاريخ الرسائل
+        channel = message.channel.name
+        if channel not in self.message_history:
+            self.message_history[channel] = deque(maxlen=5)
+        
+        # تجاهل رسائل البوت نفسه
+        if message.echo:
+            return
+        
+        # حفظ الرسالة فقط إذا لم تكن أمر الترجمة
+        if message.content.strip().lower() != 'ترجم':
+            self.message_history[channel].append(message)
         
         # طباعة الرسالة في اللوق
-        print(f'[#{message.channel.name}] <{message.author.name}>: {message.content}')
+        print(f'[#{channel}] <{message.author.name}>: {message.content}')
 
-        if message.echo:  # تجاهل رسائل البوت نفسه
-            return
-
-        # التحقق من شروط الترجمة (بدون اعتماد على الرد)
+        # معالجة أمر الترجمة
         if (
             message.content.strip().lower() == 'ترجم'
             and message.author.name.lower() == 'eiadu'
         ):
             try:
-                # الحصول على آخر رسالة قبل الأمر
-                last_msg = self.last_messages.get(message.channel.name)
+                # البحث عن آخر رسالة غير "ترجم"
+                for msg in reversed(self.message_history[channel]):
+                    if msg.content.strip().lower() != 'ترجم':
+                        translator = Translator()
+                        translated = translator.translate(msg.content, dest='ar')
+                        await message.channel.send(
+                            f"@{message.author.name} الترجمة: {translated.text}"
+                        )
+                        return
                 
-                if not last_msg or last_msg.content == message.content:
-                    await message.channel.send("⚠️ لا يوجد نص للترجمة")
-                    return
-                
-                # الترجمة
-                translator = Translator()
-                translated = translator.translate(last_msg.content, dest='ar')
-                
-                # إرسال النتيجة
-                await message.channel.send(
-                    f"@{message.author.name} الترجمة: {translated.text}"
-                )
+                await message.channel.send("⚠️ لم يتم العثور على نص للترجمة")
             except Exception as e:
                 print(f"ERROR: {str(e)}")
                 await message.channel.send("⚠️ فشلت الترجمة")
