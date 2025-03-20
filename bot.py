@@ -11,7 +11,7 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف في النص بناءً على char_map، يدعم الأحرف الكبيرة والصغيرة"""
+    """تحويل الأحرف في النص بناءً على char_map، مع دعم الأحرف الكبيرة والصغيرة"""
     return ''.join(char_map.get(ch.lower(), ch) for ch in text)
 
 class Bot(commands.Bot):
@@ -58,8 +58,11 @@ class Bot(commands.Bot):
                 # استبدال الأحرف في الرسالة الأصلية
                 replaced_message = replace_chars(original_message)
                 
-                # استبدال جميع الرموز "\" و "\s" بمسافة
+                # استبدال جميع أشكال الرموز "\" و "\s" بمسافة حقيقية
                 replaced_message = re.sub(r'\\s|\\', ' ', replaced_message)
+                
+                # تنظيف أي مسافات متكررة غير ضرورية
+                replaced_message = re.sub(r'\s+', ' ', replaced_message).strip()
                 
                 # إرسال الرد إلى القناة
                 await message.channel.send(f"انهو يقول ( {replaced_message} )")
