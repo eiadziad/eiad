@@ -1,6 +1,6 @@
 from twitchio.ext import commands
 import os
-from googletrans import Translator  # تأكد من تثبيت مكتبة googletrans باستخدام pip install googletrans
+from googletrans import Translator  # تأكد من تثبيت مكتبة googletrans باستخدام pip install googletrans==4.0.0-rc1
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -30,10 +30,10 @@ class Bot(commands.Bot):
                 parent_text = message.tags.get("reply-parent-msg-body")
                 if parent_text:
                     try:
-                        translated = self.translator.translate(parent_text, dest='ar')
-                        await message.channel.send(f"الترجمة: {translated.text}")
+                        translated = self.translator.translate(parent_text, dest='ar', src='auto')
+                        await message.channel.send(f"** {translated.text} **")
                     except Exception as e:
-                        await message.channel.send("error")
+                        await message.channel.send("❌")
                 else:
                     await message.channel.send("رد طيب")
             return
