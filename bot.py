@@ -11,7 +11,7 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات"""
+    """تحويل الأحرف اللاتينية إلى العربية مع الحفاظ على المسافات"""
     return ''.join(char_map.get(ch.lower(), ch) for ch in text)
 
 def clean_text(text):
