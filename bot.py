@@ -58,7 +58,7 @@ class Bot(commands.Bot):
                 # استبدال الأحرف في الرسالة الأصلية باستخدام replace_chars
                 replaced_message = replace_chars(original_message)
                 # استبدال الرمز "\" بمسافة
-                replaced_message = replaced_message.replace("\s\", " ")
+                replaced_message = replaced_message.replace("\s", " ")
                 
                 # إرسال الرد إلى القناة
                 await message.channel.send(f"انهو يقول ( {replaced_message} )")
