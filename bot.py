@@ -14,7 +14,7 @@ class Bot(commands.Bot):
             raise ValueError("TWITCH_CHANNELS not set!")
         
         self.channels_list = [ch.strip() for ch in channels.split(',')]
-        self.message_history = {} # تخزين آخر 5 رسائل لكل قناة
+        self.message_history = {}
         super().__init__(token=token, prefix='!', initial_channels=self.channels_list)
 
     async def event_ready(self):
@@ -22,18 +22,17 @@ class Bot(commands.Bot):
         print(f'[Bot] Channels: {self.channels_list}')
 
     async def event_message(self, message):
+        # تجاهل رسائل البوت نفسه تمامًا
+        if message.author.name.lower() == self.nick.lower():
+            return
+
         # تحديث تاريخ الرسائل
         channel = message.channel.name
         if channel not in self.message_history:
             self.message_history[channel] = deque(maxlen=5)
         
-        # تجاهل رسائل البوت نفسه
-        if message.echo:
-            return
-        
-        # حفظ الرسالة فقط إذا لم تكن أمر الترجمة
-        if message.content.strip().lower() != 'ترجم':
-            self.message_history[channel].append(message)
+        # حفظ الرسالة في التاريخ إذا لم تكن من البوت
+        self.message_history[channel].append(message)
         
         # طباعة الرسالة في اللوق
         print(f'[#{channel}] <{message.author.name}>: {message.content}')
@@ -41,12 +40,15 @@ class Bot(commands.Bot):
         # معالجة أمر الترجمة
         if (
             message.content.strip().lower() == 'ترجم'
-            and message.author.name.lower() == 'eiadu'
+            and message.author.name.lower() == 'eiadu'  # المستخدم المصرح له
         ):
             try:
-                # البحث عن آخر رسالة غير "ترجم"
+                # البحث عن آخر رسالة غير أمر الترجمة وغير من البوت
                 for msg in reversed(self.message_history[channel]):
-                    if msg.content.strip().lower() != 'ترجم':
+                    if (
+                        msg.content.strip().lower() != 'ترجم'
+                        and msg.author.name.lower() != self.nick.lower()
+                    ):
                         translator = Translator()
                         translated = translator.translate(msg.content, dest='ar')
                         await message.channel.send(
