@@ -45,6 +45,10 @@ class Bot(commands.Bot):
         print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
     async def event_message(self, message):
+        # **تجاهل أي رسالة ليس لها مرسل (author) لمنع الخطأ**
+        if not message.author:
+            return
+        
         # تجاهل الرسائل التي تبدأ بعلامة "!"
         if message.content.startswith('!'):
             print(f"Ignoring command: {message.content}")
