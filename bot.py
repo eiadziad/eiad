@@ -10,8 +10,9 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف في النص بناءً على char_map"""
-    return ''.join(char_map.get(ch, ch) for ch in text)
+    """تحويل الأحرف في النص بناءً على char_map، يدعم الأحرف الكبيرة والصغيرة"""
+    # لكل حرف، يتم تحويله لحرف صغير أولاً ثم البحث في الخريطة
+    return ''.join(char_map.get(ch.lower(), ch) for ch in text)
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -54,8 +55,10 @@ class Bot(commands.Bot):
                 original_sender = message.tags['reply-parent-display-name']
                 original_message = message.tags['reply-parent-msg-body']
                 
-                # استبدال الأحرف في الرسالة الأصلية
+                # استبدال الأحرف في الرسالة الأصلية باستخدام replace_chars
                 replaced_message = replace_chars(original_message)
+                # استبدال الرمز "\" بمسافة
+                replaced_message = replaced_message.replace("\\", " ")
                 
                 # إرسال الرد إلى القناة
                 await message.channel.send(f"انهو يقول ( {replaced_message} )")
