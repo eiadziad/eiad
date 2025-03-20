@@ -13,6 +13,7 @@ class Bot(commands.Bot):
             raise ValueError("TWITCH_CHANNELS not set!")
         
         self.channels_list = [ch.strip() for ch in channels.split(',')]
+        self.last_messages = {}  # لتخزين آخر رسالة في كل قناة
         super().__init__(token=token, prefix='!', initial_channels=self.channels_list)
 
     async def event_ready(self):
@@ -20,30 +21,40 @@ class Bot(commands.Bot):
         print(f'[Bot] Channels: {self.channels_list}')
 
     async def event_message(self, message):
-        # طباعة جميع الرسائل في اللوق دائماً
+        # تحديث آخر رسالة في القناة
+        self.last_messages[message.channel.name] = message
+        
+        # طباعة الرسالة في اللوق
         print(f'[#{message.channel.name}] <{message.author.name}>: {message.content}')
 
         if message.echo:  # تجاهل رسائل البوت نفسه
             return
 
-        # التحقق من شروط الترجمة
+        # التحقق من شروط الترجمة (بدون اعتماد على الرد)
         if (
-            message.content.strip().lower() == 'ترجم' 
-            and message.reference 
-            and message.author.name.lower() == 'EIADu'
+            message.content.strip().lower() == 'ترجم'
+            and message.author.name.lower() == 'eiadu'
         ):
             try:
-                replied_msg = await message.channel.fetch_message(message.reference.id)
+                # الحصول على آخر رسالة قبل الأمر
+                last_msg = self.last_messages.get(message.channel.name)
+                
+                if not last_msg or last_msg.content == message.content:
+                    await message.channel.send("⚠️ لا يوجد نص للترجمة")
+                    return
+                
+                # الترجمة
                 translator = Translator()
-                translated = translator.translate(replied_msg.content, dest='ar')
+                translated = translator.translate(last_msg.content, dest='ar')
+                
+                # إرسال النتيجة
                 await message.channel.send(
                     f"@{message.author.name} الترجمة: {translated.text}"
                 )
             except Exception as e:
-                print(f"Error: {str(e)}")
+                print(f"ERROR: {str(e)}")
                 await message.channel.send("⚠️ فشلت الترجمة")
 
-        # معالجة الأوامر العادية
         await self.handle_commands(message)
 
 if __name__ == "__main__":
