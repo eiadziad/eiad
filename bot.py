@@ -12,16 +12,22 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على الحروف الخاصة مثل ; بشكل صحيح"""
+    """تحويل الأحرف اللاتينية إلى العربية مع معالجة الرموز الخاصة مثل ;"""
+    # أولًا استبدل أي رمز خاص بـ * أو حرف مميز مؤقتًا
+    text = text.replace(';', '*')  # استبدال ; بـ *
+    
     # نمر على كل حرف في النص ونتأكد من تحويله
     result = []
     for char in text:
         if char in char_map:
-            result.append(char_map[char])  # نحول الحروف الموجودة في char_map
+            result.append(char_map[char])  # تحويل الحروف الموجودة في char_map
         else:
-            result.append(char)  # نترك الحروف الأخرى كما هي
+            result.append(char)  # ترك الحروف الأخرى كما هي
 
-    return ''.join(result)
+    # بعد التحويل، استبدل * بـ كاف
+    result_text = ''.join(result).replace('*', 'ك')  # استبدال * بـ كاف
+    
+    return result_text
 
 def clean_text(text):
     """تنظيف النص وإزالة أي حروف خاصة مثل @ أو الرموز في بداية أو نهاية الكلمات"""
@@ -33,6 +39,7 @@ def clean_text(text):
             converted_word = replace_chars(word)  # تحويل الكلمات
             result.append(converted_word)  # إضافة الكلمة المحولة للقائمة
     return ' '.join(result)
+
 
 
 class Bot(commands.Bot):
