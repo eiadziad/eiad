@@ -16,11 +16,22 @@ def replace_chars(text):
     result = []
     for word in text.split():
         if word.startswith('@'):
-            result.append(word)  # لا تحويل للأسماء
+            result.append(word)
         else:
+            # إزالة الرموز غير الأحرف من البداية والنهاية مؤقتًا
+            prefix = ''
+            suffix = ''
+            while word and not word[0].isalnum():
+                prefix += word[0]
+                word = word[1:]
+            while word and not word[-1].isalnum():
+                suffix = word[-1] + suffix
+                word = word[:-1]
+
             converted = ''.join(char_map.get(ch.lower(), ch) for ch in word)
-            result.append(converted)
+            result.append(prefix + converted + suffix)
     return ' '.join(result)
+
 
 
 def clean_text(text):
