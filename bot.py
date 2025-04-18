@@ -58,27 +58,36 @@ class Bot(commands.Bot):
         # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
         print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
 
-        # السماح فقط للمستخدم EIADu بتنفيذ أمر "بدل" إذا كتب كلمة "غير" فقط
+        # السماح فقط للمستخدم EIADu بتنفيذ أمر "بدل" إذا كتب "غير" فقط بعد تجاهل @الرد
         if (
             message.author.name.lower() == "eiadu"
             and 'reply-parent-msg-id' in message.tags
-            and message.content.strip().lower() == "غير"
         ):
-            if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
-                original_sender = message.tags['reply-parent-display-name']
-                original_message = message.tags['reply-parent-msg-body']
+            # إزالة المنشن إن وُجد (@اسم)
+            msg = message.content.strip()
+            if msg.startswith('@'):
+                parts = msg.split(' ', 1)
+                if len(parts) > 1:
+                    msg = parts[1].strip()
+                else:
+                    msg = ''
 
-                # تنظيف الرسالة من أي محارف غريبة قبل المعالجة
-                cleaned_message = clean_text(original_message)
+            if msg.lower() == "غير":
+                if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
+                    original_sender = message.tags['reply-parent-display-name']
+                    original_message = message.tags['reply-parent-msg-body']
 
-                # استبدال الأحرف في الرسالة الأصلية
-                replaced_message = replace_chars(cleaned_message)
+                    # تنظيف الرسالة من أي محارف غريبة قبل المعالجة
+                    cleaned_message = clean_text(original_message)
 
-                # ⏳ **إضافة تأخير لمدة ثانية واحدة قبل إرسال الرد**
-                await asyncio.sleep(1)
+                    # استبدال الأحرف في الرسالة الأصلية
+                    replaced_message = replace_chars(cleaned_message)
 
-                # إرسال الرد إلى القناة
-                await message.channel.send(f"**( {replaced_message} )**")
+                    # ⏳ **إضافة تأخير لمدة ثانية واحدة قبل إرسال الرد**
+                    await asyncio.sleep(1)
+
+                    # إرسال الرد إلى القناة
+                    await message.channel.send(f"**( {replaced_message} )**")
 
 if __name__ == "__main__":
     bot = Bot()
