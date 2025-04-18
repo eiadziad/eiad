@@ -11,25 +11,6 @@ char_map = {
     'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ', ' ': ' '  # الحفاظ على المسافات
 }
 
-mention_pattern = re.compile(r'(@\w+)')
-
-def replace_segment(text: str) -> str:
-    """يستبدل أحرف segment غير المنشن وفق char_map"""
-    return ''.join(char_map.get(ch.lower(), ch) for ch in text)
-
-def process_message(text: str) -> str:
-    """
-    يقسم النص إلى منشن وغير منشن ويعالج كل جزء:
-    - المنشن يُترك كما هو
-    - بقية النص يُستبدل بأحرفه العربية
-    ثم يُعاد جمعهم
-    """
-    parts = mention_pattern.split(text)
-    return ''.join(
-        seg if mention_pattern.fullmatch(seg) else replace_segment(seg)
-        for seg in parts
-    )
-
 def replace_chars(text):
     """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات"""
     return ''.join(char_map.get(ch.lower(), ch) for ch in text)
