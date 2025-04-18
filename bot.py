@@ -12,19 +12,28 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية بدون استثناء أي حرف"""
-    return ''.join(char_map.get(ch, ch) for ch in text)
+    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على الحروف الخاصة مثل ; بشكل صحيح"""
+    # نمر على كل حرف في النص ونتأكد من تحويله
+    result = []
+    for char in text:
+        if char in char_map:
+            result.append(char_map[char])  # نحول الحروف الموجودة في char_map
+        else:
+            result.append(char)  # نترك الحروف الأخرى كما هي
 
-
-
+    return ''.join(result)
 
 def clean_text(text):
-    """إصلاح أي تحويل غير صحيح في النص"""
-    # استبدال أي شكل من أشكال \s أو \ بمسافة حقيقية
-    text = re.sub(r'\\s|\\', ' ', text)
-    # إزالة أي مسافات متكررة
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
+    """تنظيف النص وإزالة أي حروف خاصة مثل @ أو الرموز في بداية أو نهاية الكلمات"""
+    result = []
+    for word in text.split():
+        if word.startswith('@'):
+            result.append(word)  # لا نحتاج لتغيير الكلمات التي تبدأ بـ @ (أسماء المستخدمين)
+        else:
+            converted_word = replace_chars(word)  # تحويل الكلمات
+            result.append(converted_word)  # إضافة الكلمة المحولة للقائمة
+    return ' '.join(result)
+
 
 class Bot(commands.Bot):
     def __init__(self):
