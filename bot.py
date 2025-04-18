@@ -8,19 +8,12 @@ char_map = {
     'h': 'ا', 'g': 'ل', ']': 'د', '[': 'ج', 'p': 'ح', 'o': 'خ', 'i': 'ه', 'u': 'ع', 'y': 'غ',
     't': 'ف', 'r': 'ق', 'e': 'ث', 'w': 'ص', 'q': 'ض', '`': 'ذ', "'": 'ط', ';': 'ك', 'l': 'م',
     'k': 'ن', 'j': 'ت', 'f': 'ب', 'd': 'ي', 's': 'س', 'a': 'ش', '/': 'ظ', '.': 'ز', ',': 'و',
-    'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ', ' ': ' '  # الحفاظ على المسافات
+    'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ'
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات وتجاهل الكلمات التي تبدأ بـ@"""
-    result = []
-    for word in text.split():
-        if word.startswith('@'):
-            result.append(word)  # لا تحويل للأسماء
-        else:
-            converted = ''.join(char_map[ch.lower()] if ch.lower() in char_map else ch for ch in word)
-            result.append(converted)
-    return ' '.join(result)
+    """تحويل الأحرف اللاتينية إلى العربية بدون استثناء أي حرف"""
+    return ''.join(char_map.get(ch, ch) for ch in text)
 
 
 
