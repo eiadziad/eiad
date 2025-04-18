@@ -12,10 +12,10 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية مع معالجة الرموز الخاصة مثل ;"""
-    # أولًا استبدل أي رمز خاص بـ * أو حرف مميز مؤقتًا
-    text = text.replace(';', '*')  # استبدال ; بـ *
-    
+    """تحويل الأحرف اللاتينية إلى العربية مع معالجة الرموز الخاصة مثل ; و :"""
+    # استبدال : و ; برموز مميزة لتجنب المشاكل مع Twitch
+    text = text.replace(':', 'COLON_PLACEHOLDER').replace(';', 'SEMICOLON_PLACEHOLDER')
+
     # نمر على كل حرف في النص ونتأكد من تحويله
     result = []
     for char in text:
@@ -24,9 +24,9 @@ def replace_chars(text):
         else:
             result.append(char)  # ترك الحروف الأخرى كما هي
 
-    # بعد التحويل، استبدل * بـ كاف
-    result_text = ''.join(result).replace('*', 'ك')  # استبدال * بـ كاف
-    
+    # استبدال الرموز المميزة بالرموز الأصلية بعد التحويل
+    result_text = ''.join(result).replace('COLON_PLACEHOLDER', ':').replace('SEMICOLON_PLACEHOLDER', 'ك')
+
     return result_text
 
 def clean_text(text):
@@ -39,6 +39,7 @@ def clean_text(text):
             converted_word = replace_chars(word)  # تحويل الكلمات
             result.append(converted_word)  # إضافة الكلمة المحولة للقائمة
     return ' '.join(result)
+
 
 
 
