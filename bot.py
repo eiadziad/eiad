@@ -8,38 +8,28 @@ char_map = {
     'h': 'ا', 'g': 'ل', ']': 'د', '[': 'ج', 'p': 'ح', 'o': 'خ', 'i': 'ه', 'u': 'ع', 'y': 'غ',
     't': 'ف', 'r': 'ق', 'e': 'ث', 'w': 'ص', 'q': 'ض', '`': 'ذ', "'": 'ط', ';': 'ك', 'l': 'م',
     'k': 'ن', 'j': 'ت', 'f': 'ب', 'd': 'ي', 's': 'س', 'a': 'ش', '/': 'ظ', '.': 'ز', ',': 'و',
-    'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ'
+    'm': 'ة', 'n': 'ى', 'b': 'لا', 'v': 'ر', 'c': 'ؤ', 'x': 'ء', 'z': 'ئ', ' ': ' '  # الحفاظ على المسافات
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية مع معالجة الحروف الخاصة"""
-    # إزالة الحروف الخاصة مثل ; و : من بداية ونهاية النص
-    text = text.strip(':;')
-
-    # نمر على كل حرف في النص ونتأكد من تحويله
-    result = []
-    for char in text:
-        if char in char_map:
-            result.append(char_map[char])  # تحويل الحروف الموجودة في char_map
-        else:
-            result.append(char)  # ترك الحروف الأخرى كما هي
-
-    return ''.join(result)
-
-def clean_text(text):
-    """تنظيف النص وإزالة أي حروف خاصة مثل @ أو الرموز في بداية أو نهاية الكلمات"""
+    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات وتجاهل الكلمات التي تبدأ بـ@"""
     result = []
     for word in text.split():
         if word.startswith('@'):
-            result.append(word)  # لا نحتاج لتغيير الكلمات التي تبدأ بـ @ (أسماء المستخدمين)
+            result.append(word)  # لا تحويل للأسماء
         else:
-            converted_word = replace_chars(word)  # تحويل الكلمات
-            result.append(converted_word)  # إضافة الكلمة المحولة للقائمة
+            converted = ''.join(char_map.get(ch.lower(), ch) for ch in word)
+            result.append(converted)
     return ' '.join(result)
 
 
-
-
+def clean_text(text):
+    """إصلاح أي تحويل غير صحيح في النص"""
+    # استبدال أي شكل من أشكال \s أو \ بمسافة حقيقية
+    text = re.sub(r'\\s|\\', ' ', text)
+    # إزالة أي مسافات متكررة
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
 
 class Bot(commands.Bot):
     def __init__(self):
