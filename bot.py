@@ -59,7 +59,11 @@ class Bot(commands.Bot):
         print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
         
         # السماح فقط للمستخدم EIADu أو البوت EIADu بتنفيذ أمر "بدل"
-        if message.author.name.lower() == "eiadu" and 'reply-parent-msg-id' in message.tags and 'غير' in message.content.lower():
+if (
+    message.author.name.lower() == "eiadu"
+    and 'reply-parent-msg-id' in message.tags
+    and message.content.strip().lower() == "غير"
+):
             if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
                 original_sender = message.tags['reply-parent-display-name']
                 original_message = message.tags['reply-parent-msg-body']
