@@ -12,8 +12,16 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات"""
-    return ''.join(char_map.get(ch.lower(), ch) for ch in text)
+    """تحويل الأحرف اللاتينية إلى العربية، مع الحفاظ على المسافات وتجاهل الكلمات التي تبدأ بـ@"""
+    result = []
+    for word in text.split():
+        if word.startswith('@'):
+            result.append(word)  # لا تحويل للأسماء
+        else:
+            converted = ''.join(char_map.get(ch.lower(), ch) for ch in word)
+            result.append(converted)
+    return ' '.join(result)
+
 
 def clean_text(text):
     """إصلاح أي تحويل غير صحيح في النص"""
