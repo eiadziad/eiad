@@ -45,41 +45,40 @@ class Bot(commands.Bot):
         print(f'[Bot] Logged in as | {self.nick}')
         print(f'[Bot] Successfully joined channels: {self.channels_list}')
 
-   async def event_message(self, message):
-    # **تجاهل أي رسالة ليس لها مرسل (author) لمنع الخطأ**
-    if not message.author:
-        return
+    async def event_message(self, message):
+        # **تجاهل أي رسالة ليس لها مرسل (author) لمنع الخطأ**
+        if not message.author:
+            return
 
-    # تجاهل الرسائل التي تبدأ بعلامة "!"
-    if message.content.startswith('!'):
-        print(f"Ignoring command: {message.content}")
-        return
+        # تجاهل الرسائل التي تبدأ بعلامة "!"
+        if message.content.startswith('!'):
+            print(f"Ignoring command: {message.content}")
+            return
 
-    # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
-    print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
+        # طباعة اسم القناة واسم المستخدم والرسالة في السجلات
+        print(f'#[{message.channel.name}] <{message.author.name}>: {message.content}')
 
-    # السماح فقط للمستخدم EIADu بتنفيذ أمر "بدل" إذا كتب كلمة "غير" فقط
-    if (
-        message.author.name.lower() == "eiadu"
-        and 'reply-parent-msg-id' in message.tags
-        and message.content.strip().lower() == "غير"
-    ):
-        if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
-            original_sender = message.tags['reply-parent-display-name']
-            original_message = message.tags['reply-parent-msg-body']
+        # السماح فقط للمستخدم EIADu بتنفيذ أمر "بدل" إذا كتب كلمة "غير" فقط
+        if (
+            message.author.name.lower() == "eiadu"
+            and 'reply-parent-msg-id' in message.tags
+            and message.content.strip().lower() == "غير"
+        ):
+            if 'reply-parent-display-name' in message.tags and 'reply-parent-msg-body' in message.tags:
+                original_sender = message.tags['reply-parent-display-name']
+                original_message = message.tags['reply-parent-msg-body']
 
-            # تنظيف الرسالة من أي محارف غريبة قبل المعالجة
-            cleaned_message = clean_text(original_message)
+                # تنظيف الرسالة من أي محارف غريبة قبل المعالجة
+                cleaned_message = clean_text(original_message)
 
-            # استبدال الأحرف في الرسالة الأصلية
-            replaced_message = replace_chars(cleaned_message)
+                # استبدال الأحرف في الرسالة الأصلية
+                replaced_message = replace_chars(cleaned_message)
 
-            # ⏳ **إضافة تأخير لمدة ثانية واحدة قبل إرسال الرد**
-            await asyncio.sleep(1)
+                # ⏳ **إضافة تأخير لمدة ثانية واحدة قبل إرسال الرد**
+                await asyncio.sleep(1)
 
-            # إرسال الرد إلى القناة
-            await message.channel.send(f"**( {replaced_message} )**")
-
+                # إرسال الرد إلى القناة
+                await message.channel.send(f"**( {replaced_message} )**")
 
 if __name__ == "__main__":
     bot = Bot()
