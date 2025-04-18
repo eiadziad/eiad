@@ -12,9 +12,9 @@ char_map = {
 }
 
 def replace_chars(text):
-    """تحويل الأحرف اللاتينية إلى العربية مع معالجة الرموز الخاصة مثل ; و :"""
-    # استبدال : و ; برموز مميزة لتجنب المشاكل مع Twitch
-    text = text.replace(':', 'COLON_PLACEHOLDER').replace(';', 'SEMICOLON_PLACEHOLDER')
+    """تحويل الأحرف اللاتينية إلى العربية مع معالجة الحروف الخاصة"""
+    # إزالة الحروف الخاصة مثل ; و : من بداية ونهاية النص
+    text = text.strip(':;')
 
     # نمر على كل حرف في النص ونتأكد من تحويله
     result = []
@@ -24,10 +24,7 @@ def replace_chars(text):
         else:
             result.append(char)  # ترك الحروف الأخرى كما هي
 
-    # استبدال الرموز المميزة بالرموز الأصلية بعد التحويل
-    result_text = ''.join(result).replace('COLON_PLACEHOLDER', ':').replace('SEMICOLON_PLACEHOLDER', 'ك')
-
-    return result_text
+    return ''.join(result)
 
 def clean_text(text):
     """تنظيف النص وإزالة أي حروف خاصة مثل @ أو الرموز في بداية أو نهاية الكلمات"""
@@ -39,6 +36,7 @@ def clean_text(text):
             converted_word = replace_chars(word)  # تحويل الكلمات
             result.append(converted_word)  # إضافة الكلمة المحولة للقائمة
     return ' '.join(result)
+
 
 
 
