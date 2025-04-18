@@ -73,7 +73,7 @@ class Bot(commands.Bot):
 
             reply = f"**( {replaced} )**"
             if reps:
-                reply += " | تم الاستبدال: " + ", ".join(reps)
+                reply 
             await message.channel.send(reply)
 
 if __name__ == "__main__":
